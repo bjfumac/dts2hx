@@ -19,32 +19,31 @@ using tool.StringTools;
 using tool.TsSymbolTools;
 
 typedef CliOptions = {
-	cwd: String,
-	outputPath: String,
-	tsConfigFilePath: String,
-	tsCompilerOptions: Array<String>,
-	moduleNames: Array<String>,
-	moduleSearchPath: String,
-	allDependencies: Bool,
-	noOutput: Bool,
-	locationComments: Bool,
-	libWrapper: Bool,
-	logLevel: LogLevel,
-	stdLibMode: StdLibMode,
+	cwd:String,
+	outputPath:String,
+	tsConfigFilePath:String,
+	tsCompilerOptions:Array<String>,
+	moduleNames:Array<String>,
+	moduleSearchPath:String,
+	allDependencies:Bool,
+	noOutput:Bool,
+	locationComments:Bool,
+	libWrapper:Bool,
+	logLevel:LogLevel,
+	stdLibMode:StdLibMode,
 	// experimental
-	noGlobal: Bool,
-	noModular: Bool,
+	noGlobal:Bool,
+	noModular:Bool,
 	// mergedGlobal: Bool, // todo
-	allowIntersectionRasterization: Bool,
-	queueExternalSymbols: Bool,
-	skipDependencies: Bool,
+	allowIntersectionRasterization:Bool,
+	queueExternalSymbols:Bool,
+	skipDependencies:Bool,
 }
 
 @:nullSafety
 class Main {
-
 	static public final dts2hxPackageJson = Macro.getJson('package.json');
-	static final defaultStdLibTypeMap: TypeMap = Macro.getJson('src/typemap/4.0.5-stdlib.json');
+	static final defaultStdLibTypeMap:TypeMap = Macro.getJson('src/typemap/4.0.5-stdlib.json');
 
 	static function main() {
 		Console.warnPrefix = '<b,yellow>> Warning:</b> ';
@@ -52,7 +51,7 @@ class Main {
 
 		var userArgs = Node.process.argv.slice(2);
 
-		var cliOptions: CliOptions = {
+		var cliOptions:CliOptions = {
 			cwd: null,
 			outputPath: null,
 			tsConfigFilePath: null,
@@ -74,20 +73,20 @@ class Main {
 			skipDependencies: false,
 		}
 
-		var help: Bool = false;
-		var noColor: Bool = false;
-		var silent: Bool = false;
+		var help:Bool = false;
+		var noColor:Bool = false;
+		var silent:Bool = false;
 		var defaultValueFormatting = 'yellow';
 
-		var argHandler: ArgHandler;
+		var argHandler:ArgHandler;
 		argHandler = hxargs.Args.generate([
 			@doc('Set output directory for generated externs (default <$defaultValueFormatting>".haxelib"</>)')
-			['--output', '-o'] => (path: String) -> {
+			['--output', '-o'] => (path:String) -> {
 				cliOptions.outputPath = path;
 			},
 
 			@doc('Path to use when searching for modules')
-			['--moduleSearchPath', '-p'] => (path: String) -> {
+			['--moduleSearchPath', '-p'] => (path:String) -> {
 				cliOptions.moduleSearchPath = path;
 			},
 
@@ -97,18 +96,18 @@ class Main {
 			},
 
 			@doc('Set path to tsconfig file to use when processing the .d.ts files')
-			'--tsconfig' => (path: String) -> {
+			'--tsconfig' => (path:String) -> {
 				cliOptions.tsConfigFilePath = path;
 			},
 
 			@doc('Set ts compiler option `--target`, takes precedent over options provided by --tsconfig (default <$defaultValueFormatting>"ES6"</>)')
-			'--target' => (scriptTarget: String) -> {
+			'--target' => (scriptTarget:String) -> {
 				cliOptions.tsCompilerOptions.push('--target');
 				cliOptions.tsCompilerOptions.push(scriptTarget);
 			},
 
 			@doc('Set ts compiler option `--moduleResolution`, takes precedent over options provided by --tsconfig (default <$defaultValueFormatting>"Node"</>)')
-			'--moduleResolution' => (kind: String) -> {
+			'--moduleResolution' => (kind:String) -> {
 				cliOptions.tsCompilerOptions.push('--moduleResolution');
 				cliOptions.tsCompilerOptions.push(kind);
 			},
@@ -151,9 +150,7 @@ class Main {
 			@doc('Disable terminal colors')
 			'--noColor' => () -> noColor = true,
 			// hidden alias
-			'--no-color' => () -> noColor = true,
-
-			@doc('Show this help')
+			'--no-color' => () -> noColor = true, @doc('Show this help')
 			'--help' => () -> help = true,
 
 			@doc('Disable command-line output')
@@ -162,9 +159,7 @@ class Main {
 			@doc('Disable printing warnings')
 			'--noWarn' => () -> {
 				cliOptions.logLevel = Error;
-			},
-
-			@doc('Print all logs')
+			}, @doc('Print all logs')
 			'--verbose' => () -> {
 				cliOptions.logLevel = All;
 			},
@@ -178,7 +173,7 @@ class Main {
 			'--skipDependencies' => () -> {
 				cliOptions.skipDependencies = true;
 			},
-			
+
 			// see https://github.com/haxiomic/dts2hx/issues/37#issuecomment-642242254
 			'--includeExternal' => () -> {
 				cliOptions.queueExternalSymbols = true;
@@ -186,10 +181,8 @@ class Main {
 
 			'--noDts2hxVersion' => () -> {
 				dts2hxPackageJson.version = 'x.x.x';
-			},
-
-			@doc('Module name')
-			_ => (arg: String) -> {
+			}, @doc('Module name')
+			_ => (arg:String) -> {
 				if (arg.charAt(0) == '-') {
 					throw 'Unknown argument "$arg"';
 				}
@@ -202,7 +195,9 @@ class Main {
 			Node.process.exit(1);
 			return;
 		} else {
-			try argHandler.parse(userArgs) catch (e: String) {
+			try
+				argHandler.parse(userArgs)
+			catch (e:String) {
 				Console.error(e);
 				Console.print('\n');
 				printDoc(argHandler);
@@ -273,8 +268,8 @@ class Main {
 				}
 
 				var packageObj = haxe.Json.parse(packageJson);
-				var dependencies: DynamicAccess<String> = packageObj.dependencies != null ? packageObj.dependencies : {};
-				var devDependencies: DynamicAccess<String> = packageObj.devDependencies != null ? packageObj.devDependencies : {};
+				var dependencies:DynamicAccess<String> = packageObj.dependencies != null ? packageObj.dependencies : {};
+				var devDependencies:DynamicAccess<String> = packageObj.devDependencies != null ? packageObj.devDependencies : {};
 				var allDependencies = dependencies.keys().concat(devDependencies.keys());
 
 				// check if module has typescript
@@ -290,7 +285,7 @@ class Main {
 					}
 					Log.warn('No type definitions found for <b>"${moduleName}"</b>');
 				}
-			} catch (e: String) {
+			} catch (e:String) {
 				Log.error(e);
 			}
 		}
@@ -300,7 +295,7 @@ class Main {
 		for (moduleName in cliOptions.moduleNames) {
 			moduleQueue.tryEnqueue(moduleName);
 		}
-		
+
 		// add modules from compilerOptions
 		for (moduleName in Ts.getAutomaticTypeDirectiveNames(compilerOptions, host)) {
 			moduleQueue.tryEnqueue(moduleName);
@@ -320,7 +315,7 @@ class Main {
 						cwd: typemapPath
 					});
 					haxe.Json.parse(stdLibJsonStr);
-				} catch (e: Any) {
+				} catch (e:Any) {
 					// error code
 					Log.error('Failed to generate standard library type map (using <b>${defaultStdLibTypeMap.haxeVersion}</> instead): $e');
 					defaultStdLibTypeMap;
@@ -333,36 +328,38 @@ class Main {
 
 		while (true) {
 			var moduleName = moduleQueue.dequeue();
-			if (moduleName == null) break; // finished queue
+			if (moduleName == null)
+				break; // finished queue
 
 			var converterContext = convertTsModule(moduleName, cliOptions.moduleSearchPath, compilerOptions, stdLibTypeMap, cliOptions);
-			if (converterContext == null) continue;
-			
+			if (converterContext == null)
+				continue;
+
 			var moduleDependencies = converterContext.moduleDependencies;
 			if (moduleDependencies.length > 0) {
 				Log.log('<magenta>Module <b>$moduleName</> depends on <b>$moduleDependencies</></>');
 			}
-			if (!cliOptions.skipDependencies) for (moduleDependency in moduleDependencies) {
-				moduleQueue.tryEnqueue(moduleDependency.normalizedModuleName);
-			}
+			if (!cliOptions.skipDependencies)
+				for (moduleDependency in moduleDependencies) {
+					moduleQueue.tryEnqueue(moduleDependency.normalizedModuleName);
+				}
 		}
 	}
 
-	static public function convertTsModule(moduleName: String, moduleSearchPath: String, compilerOptions: CompilerOptions, stdLibTypeMap: Null<TypeMap>, cliOptions: CliOptions): Null<ConverterContext> {
-		var converter =
-			try {
-				new ConverterContext(moduleName, moduleSearchPath, compilerOptions, stdLibTypeMap, cliOptions);
-			} catch (e: Any) {
-				Log.error(e);
-				return null;
-			}
-
+	static public function convertTsModule(moduleName:String, moduleSearchPath:String, compilerOptions:CompilerOptions, stdLibTypeMap:Null<TypeMap>,
+			cliOptions:CliOptions):Null<ConverterContext> {
+		var converter = try {
+			new ConverterContext(moduleName, moduleSearchPath, compilerOptions, stdLibTypeMap, cliOptions);
+		} catch (e:Any) {
+			Log.error(e);
+			return null;
+		}
 
 		var generateLibraryWrapper = cliOptions.libWrapper && converter.inputModule.packageId != null;
 
 		// if output path is unset, default to either .haxelib/ or externs/ depending on whether or not the input module is a package
-		var outputPath: String = if (cliOptions.outputPath != null) cliOptions.outputPath else {
-			generateLibraryWrapper ? '.haxelib' : 'externs';
+		var outputPath:String = if (cliOptions.outputPath != null) cliOptions.outputPath else {
+			generateLibraryWrapper ? '.haxelib' : '';
 		}
 
 		// in haxelib mode, use .current files to specify versions
@@ -371,15 +368,20 @@ class Main {
 		if (!cliOptions.noOutput) {
 			// save modules to files
 			var printer = new Printer();
-
+			Console.log();
 			var libraryName = haxelibLibraryName(converter.packageName != null ? converter.packageName : converter.normalizedInputModuleName);
-			var libraryVersion = converter.inputModule.packageId != null && converter.inputModule.packageId.version != null ? converter.inputModule.packageId.version : 'default';
-
+			var libraryVersion = converter.inputModule.packageId != null
+				&& converter.inputModule.packageId.version != null ? converter.inputModule.packageId.version : 'default';
+			// 我修改的
 			var outputLibraryPath = if (generateLibraryWrapper) {
 				if (haxelibMode) {
 					Path.join([outputPath, libraryName.replace('.', ','), libraryVersion.replace('.', ',')]);
 				} else {
-					Path.join([outputPath, libraryName]);
+					if (outputPath == '') {
+						Path.join([libraryName]);
+					} else {
+						Path.join([outputPath, libraryName]);
+					}
 				}
 			} else {
 				outputPath;
@@ -414,12 +416,12 @@ class Main {
 					skipModule = skipModule || (!isBuiltIn && haxeModule.tsSymbolAccess.match(AmbientModule(_) | ExportModule(_)));
 				}
 
-				if (skipModule) continue;
-
-				var filePath = Path.join([outputLibraryPath].concat(haxeModule.pack).concat(['${haxeModule.name}.hx']));
+				if (skipModule)
+					continue;
+				var filePath = Path.join([outputLibraryPath].concat(haxeModule.pack.slice(1)).concat(['${haxeModule.name}.hx']));
 				var printPackage = true;
 				var moduleHaxeStr = printer.printTypeDefinition(haxeModule, printPackage);
-
+				moduleHaxeStr = moduleHaxeStr.replace(moduleName + '.', '');
 				FileTools.touchDirectoryPath(Path.directory(filePath));
 				Fs.writeFileSync(filePath, moduleHaxeStr);
 			}
@@ -441,16 +443,20 @@ class Main {
 		return converter;
 	}
 
-	static function generateReadme(inputModuleName: String, moduleSearchPath: String, converter: ConverterContext, modulePackageJson: Null<Dynamic<Dynamic>>, stdLibTypeMap: Null<TypeMap>): String {
-		var resolvedModule: ResolvedModuleFull = converter.inputModule;
+	static function generateReadme(inputModuleName:String, moduleSearchPath:String, converter:ConverterContext, modulePackageJson:Null<Dynamic<Dynamic>>,
+			stdLibTypeMap:Null<TypeMap>):String {
+		var resolvedModule:ResolvedModuleFull = converter.inputModule;
 		var dts2hxRepoUrl = dts2hxPackageJson.repository.url;
 		var dts2hxRef = dts2hxRepoUrl != null ? '[dts2hx]($dts2hxRepoUrl)' : 'dts2hx';
-		var typesModuleVersion: Null<String> = resolvedModule.packageId != null ? resolvedModule.packageId.version : null;
+		var typesModuleVersion:Null<String> = resolvedModule.packageId != null ? resolvedModule.packageId.version : null;
 		var typesModuleName = resolvedModule.packageId != null ? resolvedModule.packageId.name : inputModuleName;
 		var typesModuleUrl = if (modulePackageJson != null) {
-			if (modulePackageJson.homepage != null) modulePackageJson.homepage;
-			else if (modulePackageJson.bugs != null && modulePackageJson.bugs.url != null) modulePackageJson.bugs.url;
-			else null;
+			if (modulePackageJson.homepage != null)
+				modulePackageJson.homepage;
+			else if (modulePackageJson.bugs != null && modulePackageJson.bugs.url != null)
+				modulePackageJson.bugs.url;
+			else
+				null;
 		} else null;
 
 		var typesModuleIdMarkdown = '${typesModuleName}${typesModuleVersion != null ? ' v$typesModuleVersion' : ''}';
@@ -468,25 +474,17 @@ class Main {
 		');
 
 		if (converter.moduleDependencies.length > 0) {
-			sections.push(
-				[
-					'## Dependencies'
-				].concat(
-					converter.moduleDependencies.map(s -> '- ${s.normalizedModuleName}')
-				).join('\n')
-			);
+			sections.push(['## Dependencies'].concat(converter.moduleDependencies.map(s -> '- ${s.normalizedModuleName}')).join('\n'));
 		}
 
 		if (modulePackageJson != null) {
-			try if (modulePackageJson.contributors != null && modulePackageJson.contributors.length > 0) {
-				sections .push(
-					[
-						'## Contributors to ${typesModuleName}'
-					].concat(
-						(modulePackageJson.contributors: Array<Dynamic<String>>).map(c -> c.url != null ? '- [${c.name}](${c.url})' : c.name)
-					).join('\n')
-				);
-			} catch (e: Any) null;
+			try
+				if (modulePackageJson.contributors != null && modulePackageJson.contributors.length > 0) {
+					sections.push(['## Contributors to ${typesModuleName}']
+						.concat((modulePackageJson.contributors : Array<Dynamic<String>>).map(c -> c.url != null ? '- [${c.name}](${c.url})' : c.name))
+						.join('\n'));
+				} catch (e:Any)
+				null;
 		}
 
 		return sections.map(s -> s.removeIndentation().trim()).join('\n\n');
@@ -498,7 +496,7 @@ class Main {
 
 		`@actions/core.js` -> `actions-core,js`
 	**/
-	static function haxelibLibraryName(moduleName: String) {
+	static function haxelibLibraryName(moduleName:String) {
 		var safeName = moduleName.replace('/', '-').replace('\\', '-');
 		// replace directory separators with -
 		// replace space with -
@@ -512,16 +510,17 @@ class Main {
 		return safeName;
 	}
 
-	static function generateHaxelibJson(inputModuleName: String, moduleSearchPath: String, converter: ConverterContext, modulePackageJson: Null<Dynamic<Dynamic>>): String {
-		var resolvedModule: ResolvedModuleFull = converter.inputModule;
+	static function generateHaxelibJson(inputModuleName:String, moduleSearchPath:String, converter:ConverterContext,
+			modulePackageJson:Null<Dynamic<Dynamic>>):String {
+		var resolvedModule:ResolvedModuleFull = converter.inputModule;
 		var moduleName = converter.packageName != null ? converter.packageName : converter.normalizedInputModuleName;
-		var moduleVersion: Null<String> = resolvedModule.packageId != null ? resolvedModule.packageId.version : null;
-		var haxelib: Dynamic = {
+		var moduleVersion:Null<String> = resolvedModule.packageId != null ? resolvedModule.packageId.version : null;
+		var haxelib:Dynamic = {
 			name: moduleName,
 			tags: [moduleName, "externs", "typescript", "javascript", "dts2hx"],
 			description: 'Externs for ${moduleName}${moduleVersion != null ? ' v$moduleVersion' : ''} automatically generated by dts2hx',
 			contributors: ["haxiomic"],
-			dependencies: { }
+			dependencies: {}
 		}
 		if (moduleVersion != null) {
 			haxelib.version = moduleVersion;
@@ -535,15 +534,15 @@ class Main {
 		return haxe.Json.stringify(haxelib, null, '\t');
 	}
 
-	static function getModulePackageJson(moduleName: String, moduleSearchPath: String, resolvedModule: ResolvedModuleFull): Null<Dynamic<Dynamic>> {
+	static function getModulePackageJson(moduleName:String, moduleSearchPath:String, resolvedModule:ResolvedModuleFull):Null<Dynamic<Dynamic>> {
 		var typesModuleName = resolvedModule.packageId != null ? resolvedModule.packageId.name : moduleName;
 		return try {
 			var packageJsonPath = js.Syntax.code('require.resolve({0}, {paths: [{1}]})', '$typesModuleName/package.json', moduleSearchPath);
-			haxe.Json.parse(Fs.readFileSync(packageJsonPath, { encoding: "utf8" }));
-		} catch (e: Any) null;
+			haxe.Json.parse(Fs.readFileSync(packageJsonPath, {encoding: "utf8"}));
+		} catch (e:Any) null;
 	}
 
-	static function extend<T>(base: T, extendWidth: T): T {
+	static function extend<T>(base:T, extendWidth:T):T {
 		var extended = {};
 		for (field in Reflect.fields(base)) {
 			Reflect.setField(extended, field, Reflect.field(base, field));
@@ -554,7 +553,7 @@ class Main {
 		return cast extended;
 	}
 
-	static function printDoc(argHandler: ArgHandler) {
+	static function printDoc(argHandler:ArgHandler) {
 		Console.printlnFormatted('<b>dts2hx</b> <b>${dts2hxPackageJson.version}</> <red>alpha</> using <b>TypeScript ${typescript.Ts.version}</>');
 		Console.println('TypeScript definition to haxe extern converter');
 		Console.println('');
@@ -575,14 +574,15 @@ class Main {
 		var formattedOptions = [];
 
 		for (item in argHandler.options) {
-			if (item.doc == null) continue;
+			if (item.doc == null)
+				continue;
 
 			var usageString = '${item.flags.join(', ')}';
 
 			if (item.args.length > 0) {
-				usageString += ' <i,cyan>' + item.args.map(a -> '{${a.opt?'?':''}${a.name}}').join(', ') + '</>';
+				usageString += ' <i,cyan>' + item.args.map(a -> '{${a.opt ? '?' : ''}${a.name}}').join(', ') + '</>';
 			}
-			
+
 			var unformattedLength = Console.stripFormatting(usageString).length;
 
 			formattedOptions.push({
@@ -601,7 +601,6 @@ class Main {
 
 		Console.printFormatted(lines.join('\n') + '\n');
 	}
-
 }
 
 enum StdLibMode {
